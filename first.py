@@ -16,8 +16,8 @@ class Example(QMainWindow):
     def get_image(self, coords, scale):
         if scale > 21:
             scale = 21
-        elif scale < 0:
-            scale = 0
+        elif scale <= 0:
+            scale = 1
         scale = int(scale)
 
         if scale == 1 or scale == 0:  # более красивое отображение
@@ -41,7 +41,7 @@ class Example(QMainWindow):
 
     def initUI(self):
         self.coords = "39.847061,57.576481"
-        self.scale = 18
+        self.scale = 1  # значения от 1 до 21
 
         self.setGeometry(100, 100, *SCREEN_SIZE)
         self.setWindowTitle('Задание 1')
