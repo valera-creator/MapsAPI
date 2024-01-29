@@ -14,6 +14,17 @@ class Example(QMainWindow):
         self.initUI()
 
     def get_image(self, coords, scale):
+        if scale > 21:
+            scale = 21
+        elif scale < 0:
+            scale = 0
+        scale = int(scale)
+
+        if scale == 1 or scale == 0:  # более красивое отображение
+            coords = coords.split(',')
+            coords[-1] = '0'
+            coords = ','.join(coords)
+
         map_request = f"http://static-maps.yandex.ru/1.x/?ll={coords}&z={scale}&l=map"
         response = requests.get(map_request)
 
@@ -29,8 +40,8 @@ class Example(QMainWindow):
             file.write(response.content)
 
     def initUI(self):
-        self.coords = "39.847061,27.576481"
-        self.scale = 2
+        self.coords = "39.847061,57.576481"
+        self.scale = 18
 
         self.setGeometry(100, 100, *SCREEN_SIZE)
         self.setWindowTitle('Задание 1')
