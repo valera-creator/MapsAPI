@@ -7,6 +7,28 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit
 from PyQt5.QtCore import Qt
 
+
+def get_coords(scale, coords):
+    if scale > 21:
+        scale = 21
+    elif scale <= 0:
+        scale = 1
+    scale = int(scale)
+
+    if scale == 1 or scale == 0:  # более красивое отображение
+        coords = coords.split(',')
+        coords[-1] = '0'
+        coords = ','.join(coords)
+    return coords
+
+
+def check_response(response):
+    if not response:
+        print("Ошибка выполнения запроса:")
+        print("Http статус:", response.status_code, "(", response.reason, ")")
+        quit()
+
+
 SCREEN_SIZE = [600, 450]
 
 
@@ -16,25 +38,17 @@ class Example(QMainWindow):
         self.initUI()
 
     def get_image(self, coords, scale):
-        if scale > 21:
-            scale = 21
-        elif scale <= 0:
-            scale = 1
-        scale = int(scale)
+        coords = get_coords(scale, coords)
 
-        if scale == 1 or scale == 0:  # более красивое отображение
-            coords = coords.split(',')
-            coords[-1] = '0'
-            coords = ','.join(coords)
+        search_params = {
+            'll': coords,
+            'z': scale,
+            'l': 'map'
+        }
+        link = 'http://static-maps.yandex.ru/1.x/'
 
-        map_request = f"http://static-maps.yandex.ru/1.x/?ll={coords}&z={scale}&l=map"
-        response = requests.get(map_request)
-
-        if not response:
-            print("Ошибка выполнения запроса:")
-            print(map_request)
-            print("Http статус:", response.status_code, "(", response.reason, ")")
-            quit()
+        response = requests.get(link, search_params)
+        check_response(response)
 
         # Запишем полученное изображение в файл.
         self.map_file = f"map.png"
