@@ -91,7 +91,11 @@ class Example(QMainWindow):
         data = response.json()
         coords = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos'].split()
         coords = ','.join(coords)
-        self.scale = 8
+
+        if self.scale < 8:
+            self.scale = 8
+        elif self.scale > 12:
+            self.scale = 12
 
         self.get_image(coords, self.scale, pt='pm2lbm')
         self.coords = coords
