@@ -93,34 +93,16 @@ class Example(QMainWindow):
         coords = ','.join(coords)
         self.scale = 8
 
-        self.make_request_image(coords)
+        self.get_image(coords, self.scale, pt='pm2lbm')
+        self.coords = coords
         self.image.setPixmap(QPixmap(self.map_file))
-
-    def make_request_image(self, geocode_place):
-        self.coords = geocode_place
-        search_params = {
-            'l': self.cur_type_map,
-            'll': geocode_place,
-            'pt': f'{geocode_place},pm2dgl',
-            'spn': '1.002,1.002'
-        }
-        link = f"http://static-maps.yandex.ru/1.x/"
-
-        response = requests.get(link, params=search_params)
-        check_response(response)
-
-        # Запишем полученное изображение в файл.
-        self.map_file = f"map.png"
-        with open(self.map_file, "wb") as file:
-            file.write(response.content)
-        return
 
     def btn_combobox_click(self):
         self.cur_type_map = self.combobox.currentText()
         self.get_image(self.coords, self.scale)
         self.image.setPixmap(QPixmap(self.map_file))
 
-    def get_image(self, coords, scale):
+    def get_image(self, coords, scale, pt=''):
         coords = get_coords(scale, coords)
 
         search_params = {
@@ -128,6 +110,8 @@ class Example(QMainWindow):
             'z': scale,
             'l': self.cur_type_map
         }
+        if pt != '': search_params['pt'] = f'{coords},pm2dgl'
+
         link = 'http://static-maps.yandex.ru/1.x/'
 
         response = requests.get(link, search_params)
