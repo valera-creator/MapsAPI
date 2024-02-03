@@ -76,6 +76,23 @@ class Example(QMainWindow):
             if abs(float(cords[0])) >= 180:
                 return
             self.coords = ','.join(cords)
+
+        elif event.key() == Qt.Key_Up:
+            cords = self.coords.split(',')
+            step = 180 / pow(2, self.scale)
+            cords[1] = str(float(cords[1]) + abs(step))
+            if abs(float(cords[1])) >= 90:
+                return
+            self.coords = ','.join(cords)
+
+        elif event.key() == Qt.Key_Down:
+            cords = self.coords.split(',')
+            step = 180 / pow(2, self.scale)
+            cords[1] = str(float(cords[1]) - abs(step))
+            if abs(float(cords[1])) >= 90:
+                return
+            self.coords = ','.join(cords)
+
         self.get_image(self.coords, self.scale)
         self.image.setPixmap(QPixmap('map.png'))
 
