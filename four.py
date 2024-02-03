@@ -4,13 +4,13 @@ import sys
 
 import requests
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QComboBox, QPushButton
 from PyQt5.QtCore import Qt
 
 
 def get_coords(scale, coords):
     if scale > 21:
-        scale = 21
+        scale = 20
     elif scale <= 0:
         scale = 1
     scale = int(scale)
@@ -29,7 +29,7 @@ def check_response(response):
         quit()
 
 
-SCREEN_SIZE = [600, 450]
+SCREEN_SIZE = [600, 520]
 
 
 class Example(QMainWindow):
@@ -40,10 +40,20 @@ class Example(QMainWindow):
     def initUI(self):
         self.coords = "39.847061,57.576481"
         self.scale = 1  # значения от 1 до 21
-
+        self.cur_type_map = 'map'
         self.setGeometry(100, 100, *SCREEN_SIZE)
-        self.setWindowTitle('Задание 3')
+        self.setWindowTitle('Задание 4')
         self.get_image(self.coords, self.scale)
+
+        self.combobox = Combo(self)
+        self.combobox.move(240, 465)
+        self.combobox.resize(110, 20)
+        self.combobox.addItems(('map', 'sat', 'skl'))
+
+        self.btn = QPushButton('Сменить тип карты', self)
+        self.btn.move(240, 485)
+        self.btn.resize(110, 30)
+        self.btn.clicked.connect(self.btn_click)
 
         ## Изображение
         self.pixmap = QPixmap('map.png')
@@ -51,13 +61,18 @@ class Example(QMainWindow):
         self.image.resize(600, 450)
         self.image.setPixmap(self.pixmap)
 
+    def btn_click(self):
+        self.cur_type_map = self.combobox.currentText()
+        self.get_image(self.coords, self.scale)
+        self.image.setPixmap(QPixmap(self.map_file))
+
     def get_image(self, coords, scale):
         coords = get_coords(scale, coords)
 
         search_params = {
             'll': coords,
             'z': scale,
-            'l': 'map'
+            'l': self.cur_type_map
         }
         link = 'http://static-maps.yandex.ru/1.x/'
 
@@ -70,7 +85,7 @@ class Example(QMainWindow):
             file.write(response.content)
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_PageUp and self.scale < 21:
+        if event.key() == Qt.Key_PageUp and self.scale < 20:
             self.scale += 1
         elif event.key() == Qt.Key_PageDown and self.scale > 0:
             self.scale -= 1
@@ -113,6 +128,11 @@ class Example(QMainWindow):
     def closeEvent(self, event):
         """При закрытии формы подчищаем за собой"""
         os.remove('map.png')
+
+
+class Combo(QComboBox):
+    def keyPressEvent(self, event):
+        ex.keyPressEvent(event)
 
 
 def except_hook(cls, exception, traceback):
