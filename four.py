@@ -39,7 +39,7 @@ class Example(QMainWindow):
 
     def initUI(self):
         self.coords = "39.847061,57.576481"
-        self.scale = 1  # значения от 1 до 21
+        self.scale = 1
         self.cur_type_map = 'map'
         self.setGeometry(100, 100, *SCREEN_SIZE)
         self.setWindowTitle('Задание 4')

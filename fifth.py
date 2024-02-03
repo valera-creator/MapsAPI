@@ -39,35 +39,31 @@ class Example(QMainWindow):
 
     def initUI(self):
         self.coords = "39.847061,57.576481"
-        self.scale = 1  # значения от 1 до 21
+        self.scale = 1
         self.cur_type_map = 'map'
         self.setGeometry(100, 100, *SCREEN_SIZE)
         self.setWindowTitle('Задание 5')
         self.get_image(self.coords, self.scale)
 
         self.combobox = Combo(self)
-        self.combobox.move(40, 465)
-        self.combobox.resize(110, 20)
+        self.combobox.move(110, 465)
+        self.combobox.resize(150, 20)
         self.combobox.addItems(('map', 'sat', 'skl'))
 
         self.btn_combobox = QPushButton('Сменить тип карты', self)
-        self.btn_combobox.move(40, 485)
-        self.btn_combobox.resize(110, 30)
+        self.btn_combobox.move(110, 485)
+        self.btn_combobox.resize(150, 30)
         self.btn_combobox.clicked.connect(self.btn_combobox_click)
 
         self.lineedit = QLineEdit(self)
         self.lineedit.setPlaceholderText('Введите место поиска здесь')
-        self.lineedit.move(400, 465)
+        self.lineedit.move(300, 465)
         self.lineedit.resize(190, 25)
 
         self.btn_lineedit = QPushButton('Начать поиск', self)
-        self.btn_lineedit.move(400, 490)
+        self.btn_lineedit.move(300, 490)
         self.btn_lineedit.resize(190, 25)
         self.btn_lineedit.clicked.connect(self.btn_lineedit_click)
-
-        self.settings_fields = QPushButton('Отключить поля ввода', self)
-        self.settings_fields.move(220, 480)
-        self.settings_fields.resize(135, 25)
 
         ## Изображение
         self.pixmap = QPixmap('map.png')
@@ -89,7 +85,10 @@ class Example(QMainWindow):
         check_response(response)
 
         data = response.json()
-        coords = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos'].split()
+        try:
+            coords = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos'].split()
+        except Exception:  # на случай если что-то произойдет с поиском
+            return
         coords = ','.join(coords)
 
         if self.scale < 8:
