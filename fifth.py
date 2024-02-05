@@ -48,7 +48,7 @@ class Example(QMainWindow):
         self.combobox = Combo(self)
         self.combobox.move(110, 465)
         self.combobox.resize(150, 20)
-        self.combobox.addItems(('map', 'sat', 'skl'))
+        self.combobox.addItems(('карта', 'спутник', 'гибрид'))
 
         self.btn_combobox = QPushButton('Сменить тип карты', self)
         self.btn_combobox.move(110, 485)
@@ -101,7 +101,8 @@ class Example(QMainWindow):
         self.image.setPixmap(QPixmap(self.map_file))
 
     def btn_combobox_click(self):
-        self.cur_type_map = self.combobox.currentText()
+        translate = {'карта': 'map', 'спутник': 'sat', 'гибрид': 'sat,skl'}
+        self.cur_type_map = translate[self.combobox.currentText()]
         self.get_image(self.coords, self.scale)
         self.image.setPixmap(QPixmap(self.map_file))
 
