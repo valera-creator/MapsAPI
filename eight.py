@@ -1,4 +1,3 @@
-import math
 import os
 import sys
 
@@ -43,7 +42,7 @@ class Example(QMainWindow):
         self.scale = 1
         self.cur_type_map = 'map'
         self.setGeometry(100, 100, *SCREEN_SIZE)
-        self.setWindowTitle('Задание 6')
+        self.setWindowTitle('Задание 8')
         self.get_image(self.coords, self.scale)
 
         self.combobox = Combo(self)
@@ -66,9 +65,9 @@ class Example(QMainWindow):
         self.btn_lineedit.resize(190, 25)
         self.btn_lineedit.clicked.connect(self.btn_lineedit_click)
 
-        self.btn_reset = QPushButton('Сброс', self)
+        self.btn_reset = QPushButton('Сброс метки', self)
         self.btn_reset.move(500, 490)
-        self.btn_reset.resize(50, 25)
+        self.btn_reset.resize(90, 25)
         self.btn_reset.clicked.connect(self.btn_reset_click)
 
         self.btn_addresses = QPushButton('Вывод адреса', self)
@@ -112,7 +111,6 @@ class Example(QMainWindow):
             return
         coords = ','.join(coords)
 
-
         if self.scale < 8:
             self.scale = 8
         elif self.scale > 12:
@@ -126,11 +124,11 @@ class Example(QMainWindow):
         data = self.response.json()
         cords = ''
         try:
-            coords = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['text']
+            coords = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
+                'GeocoderMetaData']['text']
             self.lineedit.setText(coords)
         except Exception:  # на случай если что-то произойдет с поиском
             return
-        print(coords)
 
     def btn_reset_click(self):
         self.pt = ''
