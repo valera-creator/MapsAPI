@@ -124,11 +124,11 @@ class Example(QMainWindow):
 
     def btn_addresses_clicked(self):
         data = self.response.json()
+        cords = ''
         try:
-            print('ti')
             coords = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['text']
+            self.lineedit.setText(coords)
         except Exception:  # на случай если что-то произойдет с поиском
-            print('lox')
             return
         print(coords)
 
