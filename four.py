@@ -55,7 +55,7 @@ class Example(QMainWindow):
         self.btn.resize(110, 30)
         self.btn.clicked.connect(self.btn_click)
 
-        ## Изображение
+        # Изображение
         self.pixmap = QPixmap('map.png')
         self.image = QLabel(self)
         self.image.resize(600, 450)

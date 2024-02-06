@@ -47,7 +47,7 @@ class Example(QMainWindow):
         self.setWindowTitle('Задание 1')
         self.get_image(self.coords, self.scale)
 
-        ## Изображение
+        # Изображение
         self.pixmap = QPixmap('map.png')
         self.image = QLabel(self)
         self.image.resize(600, 450)

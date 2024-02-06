@@ -65,7 +65,7 @@ class Example(QMainWindow):
         self.btn_lineedit.resize(190, 25)
         self.btn_lineedit.clicked.connect(self.btn_lineedit_click)
 
-        ## Изображение
+        # Изображение
         self.pixmap = QPixmap('map.png')
         self.image = QLabel(self)
         self.image.resize(600, 450)
@@ -114,7 +114,8 @@ class Example(QMainWindow):
             'z': scale,
             'l': self.cur_type_map
         }
-        if pt != '': search_params['pt'] = f'{coords},pm2dgl'
+        if pt != '':
+            search_params['pt'] = f'{coords},pm2dgl'
 
         link = 'http://static-maps.yandex.ru/1.x/'
 
