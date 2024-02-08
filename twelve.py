@@ -65,6 +65,7 @@ class Example(QMainWindow):
 
     def initUI(self):
         self.coords = "39.847061,57.576481"
+        self.image_x, self.image_y = 600, 450
         self.SCREEN_SIZE = [600, 530]
         self.pt = ''
         self.scale = 1
@@ -114,7 +115,7 @@ class Example(QMainWindow):
         # Изображение
         self.pixmap = QPixmap('map.png')
         self.image = QLabel(self)
-        self.image.resize(600, 450)
+        self.image.resize(self.image_x, self.image_y)
         self.image.setPixmap(self.pixmap)
 
         self.box_adresses = QCheckBox('почтовый индекс', self)
@@ -269,7 +270,7 @@ class Example(QMainWindow):
     def left_mouse_click(self, event):
         x = event.pos().x()
         y = event.pos().y()
-        if not (0 <= x <= 600 and 0 <= y <= 450):
+        if not (0 <= x <= self.image_x and 0 <= y <= self.image_y):
             return
         if self.scale < 8:
             self.statusBar().showMessage(
@@ -278,8 +279,8 @@ class Example(QMainWindow):
             return
         coord_to_geo_x, coord_to_geo_y = 0.0000428, 0.0000428
         coords = self.coords.split(',')
-        dy = 225 - y
-        dx = x - 300
+        dy = self.image_y // 2 - y
+        dx = x - self.image_x // 2
 
         lx = float(coords[0]) + dx * coord_to_geo_x * 2 ** (15 - self.scale)
         ly = float(coords[1]) + dy * coord_to_geo_y * math.cos(math.radians(float(coords[1]))) * 2 ** (
@@ -300,7 +301,7 @@ class Example(QMainWindow):
     def right_mouse_click(self, event):
         x = event.pos().x()
         y = event.pos().y()
-        if not (0 <= x <= 600 and 0 <= y <= 450):
+        if not (0 <= x <= self.image_x and 0 <= y <= self.image_y):
             return
         if self.scale < 8:
             self.statusBar().showMessage(
@@ -309,8 +310,8 @@ class Example(QMainWindow):
             return
         coord_to_geo_x, coord_to_geo_y = 0.0000428, 0.0000428
         coords_obj = self.coords.split(',')
-        dy = 225 - y
-        dx = x - 300
+        dy = self.image_y // 2 - y
+        dx = x - self.image_x // 2
 
         lx = float(coords_obj[0]) + dx * coord_to_geo_x * 2 ** (15 - self.scale)
         ly = float(coords_obj[1]) + dy * coord_to_geo_y * math.cos(math.radians(float(coords_obj[1]))) * 2 ** (
