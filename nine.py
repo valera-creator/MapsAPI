@@ -89,7 +89,7 @@ class Example(QMainWindow):
         link = 'https://geocode-maps.yandex.ru/1.x/'
         self.response = requests.get(link, seach_params)
 
-        self.box_adresses = QCheckBox(self)
+        self.box_adresses = QCheckBox('почт. индекс', self)
         self.box_adresses.move(10, 460)
         self.box_adresses.clicked.connect(self.postal_code)
 
