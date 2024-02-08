@@ -1,9 +1,10 @@
+import math
 import os
 import sys
-import math
+
 import requests
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QComboBox, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QComboBox, QPushButton, QCheckBox
 from PyQt5.QtCore import Qt
 
 
@@ -23,13 +24,12 @@ def get_coords(scale, coords):
 
 def check_response(response):
     if not response:
-        # print("Ошибка выполнения запроса:")
-        # print("Http статус:", response.status_code, "(", response.reason, ")")
-        # quit()
-        print(response.content)
+        print("Ошибка выполнения запроса:")
+        print("Http статус:", response.status_code, "(", response.reason, ")")
+        quit()
 
 
-SCREEN_SIZE = [600, 520]
+SCREEN_SIZE = [600, 530]
 
 
 class Example(QMainWindow):
@@ -43,7 +43,7 @@ class Example(QMainWindow):
         self.scale = 1
         self.cur_type_map = 'map'
         self.setGeometry(100, 100, *SCREEN_SIZE)
-        self.setWindowTitle('Задание 8')
+        self.setWindowTitle('Задание 11')
         self.get_image(self.coords, self.scale)
 
         self.combobox = Combo(self)
@@ -75,20 +75,49 @@ class Example(QMainWindow):
         self.btn_addresses.move(500, 465)
         self.btn_addresses.resize(90, 25)
         self.btn_addresses.clicked.connect(self.btn_addresses_clicked)
+
+        self.response = self.get_response('39.847061,57.576481')
+
         # Изображение
         self.pixmap = QPixmap('map.png')
         self.image = QLabel(self)
         self.image.resize(600, 450)
         self.image.setPixmap(self.pixmap)
 
+        self.box_adresses = QCheckBox('почт. индекс', self)
+        self.box_adresses.move(10, 460)
+        self.box_adresses.clicked.connect(self.postal_code)
+
+        self.is_postal_code = False
+
+    def get_response(self, geocode):
         seach_params = {
-            'geocode': 'Ярославль',
+            'geocode': geocode,
             'apikey': '40d1649f-0493-4b70-98ba-98533de7710b',
             'format': 'json'
         }
 
         link = 'https://geocode-maps.yandex.ru/1.x/'
-        self.response = requests.get(link, seach_params)
+        return requests.get(link, seach_params)
+
+    def postal_code(self):
+        self.is_postal_code = self.box_adresses.isChecked()
+        data = self.response.json()
+        print(self.is_postal_code)
+        try:
+            coords = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
+                'GeocoderMetaData']['text']
+        except Exception:
+            return
+        if self.is_postal_code:
+            try:
+                info = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
+                    'GeocoderMetaData']['Address']['postal_code']
+                coords += f", {info}"
+            except Exception:  # на случай если что-то произойдет с поиском
+                self.lineedit.setText(coords)
+                return
+        self.lineedit.setText(coords)
 
     def btn_lineedit_click(self):
         if not self.lineedit.text():
@@ -123,10 +152,13 @@ class Example(QMainWindow):
 
     def btn_addresses_clicked(self):
         data = self.response.json()
-        cords = ''
         try:
             coords = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
                 'GeocoderMetaData']['text']
+            if self.is_postal_code:
+                info = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
+                    'GeocoderMetaData']['Address']['postal_code']
+                coords += f", {info}"
             self.lineedit.setText(coords)
         except Exception:  # на случай если что-то произойдет с поиском
             return
@@ -148,7 +180,7 @@ class Example(QMainWindow):
         search_params = {
             'll': coords,
             'z': scale,
-            'l': self.cur_type_map,
+            'l': self.cur_type_map
         }
         if self.pt != '':
             search_params['pt'] = self.pt
@@ -173,7 +205,7 @@ class Example(QMainWindow):
             cords = self.coords.split(',')
             step = 360 / pow(2, self.scale)
             cords[0] = str(float(cords[0]) - abs(step))
-            if abs(float(cords[0])) >= 180:
+            if abs(float(cords[0])) >= 177:
                 return
             self.coords = ','.join(cords)
 
@@ -181,7 +213,7 @@ class Example(QMainWindow):
             cords = self.coords.split(',')
             step = 360 / pow(2, self.scale)
             cords[0] = str(float(cords[0]) + abs(step))
-            if abs(float(cords[0])) >= 180:
+            if abs(float(cords[0])) >= 177:
                 return
             self.coords = ','.join(cords)
 
@@ -206,24 +238,42 @@ class Example(QMainWindow):
         self.get_image(self.coords, self.scale)
         self.image.setPixmap(QPixmap('map.png'))
 
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.statusBar().clearMessage()
+            x = event.pos().x()
+            y = event.pos().y()
+            if not (0 <= x <= 600 and 0 <= y <= 450):
+                return
+            if self.scale < 8:
+                self.statusBar().showMessage(
+                    f'Использование меток при помощи мыши допустимо только при мастштабе от 8, '
+                    f'текущий масштаб: {self.scale}')
+                return
+            coord_to_geo_x, coord_to_geo_y = 0.0000428, 0.0000428
+            coords = self.coords.split(',')
+            dy = 225 - y
+            dx = x - 300
+
+            lx = float(coords[0]) + dx * coord_to_geo_x * 2 ** (15 - self.scale)
+            ly = float(coords[1]) + dy * coord_to_geo_y * math.cos(math.radians(float(coords[1]))) * 2 ** (
+                    15 - self.scale)
+            if lx > 180:
+                lx -= 360
+            elif lx < -180:
+                lx += 360
+
+            self.pt = f"{lx},{ly},pm2lbm"
+            self.get_image(self.coords, self.scale)
+            self.image.setPixmap(QPixmap(self.map_file))
+
+            self.response = self.get_response(f'{lx},{ly}')
+            check_response(self.response)
+            self.postal_code()
+
     def closeEvent(self, event):
         """При закрытии формы подчищаем за собой"""
         os.remove('map.png')
-
-    def mousePressEvent(self, event):
-        x = event.pos().x()
-        y = event.pos().y()
-        if not (0 <= x <= 600 and 0 <= y <= 450):
-            return
-        step_x = (360 / pow(2, self.scale)) / 300  # кол-во градусов в одном пикселе по x
-        step_y = (180 / pow(2, self.scale)) / 225  # кол-во градусов в одном пикселе по y
-        move_x = x - 300
-        move_y = 225 - y
-        coords = self.coords.split(',')
-        self.pt = f"{float(coords[0]) + step_x * move_x},{float(coords[1]) + step_y * move_y},pm2lbm"
-        print(self.pt)
-        self.get_image(self.coords, self.scale)
-        self.image.setPixmap(QPixmap(self.map_file))
 
 
 class Combo(QComboBox):
