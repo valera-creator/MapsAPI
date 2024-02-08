@@ -29,9 +29,6 @@ def check_response(response):
         quit()
 
 
-SCREEN_SIZE = [600, 530]
-
-
 class Example(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -39,10 +36,12 @@ class Example(QMainWindow):
 
     def initUI(self):
         self.coords = "39.847061,57.576481"
+        self.SCREEN_SIZE = [600, 530]
         self.pt = ''
         self.scale = 1
         self.cur_type_map = 'map'
-        self.setGeometry(100, 100, *SCREEN_SIZE)
+        self.setGeometry(100, 100, *self.SCREEN_SIZE)
+        self.setFixedSize(*self.SCREEN_SIZE)
         self.setWindowTitle('Задание 11')
         self.get_image(self.coords, self.scale)
 
@@ -103,38 +102,30 @@ class Example(QMainWindow):
     def postal_code(self):
         self.is_postal_code = self.box_adresses.isChecked()
         data = self.response.json()
-        print(self.is_postal_code)
+
         try:
             coords = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
                 'GeocoderMetaData']['text']
-        except Exception:
+            self.lineedit.setText(coords)
+        except Exception:  # на случай если что-то произойдет с поиском
             return
+
         if self.is_postal_code:
             try:
                 info = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
                     'GeocoderMetaData']['Address']['postal_code']
-                coords += f", {info}"
-            except Exception:  # на случай если что-то произойдет с поиском
-                self.lineedit.setText(coords)
+                self.lineedit.setText(f'{coords}, {info}')
+            except Exception:  # если нет почтового индекса
                 return
-        self.lineedit.setText(coords)
 
     def btn_lineedit_click(self):
         if not self.lineedit.text():
             return
 
-        seach_params = {
-            'geocode': self.lineedit.text(),
-            'apikey': '40d1649f-0493-4b70-98ba-98533de7710b',
-            'format': 'json'
-        }
+        self.response = self.get_response(self.lineedit.text())
+        check_response(self.response)
+        data = self.response.json()
 
-        link = 'https://geocode-maps.yandex.ru/1.x/'
-        response = requests.get(link, seach_params)
-        self.response = response
-        check_response(response)
-
-        data = response.json()
         try:
             coords = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point']['pos'].split()
         except Exception:  # на случай если что-то произойдет с поиском
@@ -145,6 +136,7 @@ class Example(QMainWindow):
             self.scale = 8
         elif self.scale > 12:
             self.scale = 12
+
         self.pt = f'{coords},pm2lbm'
         self.get_image(coords, self.scale)
         self.coords = coords
