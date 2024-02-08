@@ -1,10 +1,9 @@
-import math
 import os
 import sys
 
 import requests
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QComboBox, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QComboBox, QPushButton
 from PyQt5.QtCore import Qt
 
 
@@ -29,19 +28,17 @@ def check_response(response):
         quit()
 
 
-SCREEN_SIZE = [600, 520]
-
-
 class Example(QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
 
     def initUI(self):
+        self.SCREEN_SIZE = [600, 520]
         self.coords = "39.847061,57.576481"
         self.scale = 1
         self.cur_type_map = 'map'
-        self.setGeometry(100, 100, *SCREEN_SIZE)
+        self.setGeometry(100, 100, *self.SCREEN_SIZE)
         self.setWindowTitle('Задание 4')
         self.get_image(self.coords, self.scale)
 

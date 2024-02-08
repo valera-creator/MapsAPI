@@ -1,4 +1,3 @@
-import math
 import os
 import sys
 
@@ -29,20 +28,18 @@ def check_response(response):
         quit()
 
 
-SCREEN_SIZE = [600, 520]
-
-
 class Example(QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
 
     def initUI(self):
+        self.SCREEN_SIZE = [600, 520]
         self.coords = "39.847061,57.576481"
         self.pt = ''
         self.scale = 1
         self.cur_type_map = 'map'
-        self.setGeometry(100, 100, *SCREEN_SIZE)
+        self.setGeometry(100, 100, *self.SCREEN_SIZE)
         self.setWindowTitle('Задание 7')
         self.get_image(self.coords, self.scale)
 
@@ -56,10 +53,10 @@ class Example(QMainWindow):
         self.btn_combobox.resize(150, 30)
         self.btn_combobox.clicked.connect(self.btn_combobox_click)
 
-        self.lineedit = QLineEdit(self)
-        self.lineedit.setPlaceholderText('Введите место поиска здесь')
-        self.lineedit.move(300, 465)
-        self.lineedit.resize(190, 25)
+        self.search_lineedit = QLineEdit(self)
+        self.search_lineedit.setPlaceholderText('Введите место поиска здесь')
+        self.search_lineedit.move(300, 465)
+        self.search_lineedit.resize(190, 25)
 
         self.btn_lineedit = QPushButton('Начать поиск', self)
         self.btn_lineedit.move(300, 490)
@@ -78,11 +75,11 @@ class Example(QMainWindow):
         self.image.setPixmap(self.pixmap)
 
     def btn_lineedit_click(self):
-        if not self.lineedit.text():
+        if not self.search_lineedit.text():
             return
 
         seach_params = {
-            'geocode': self.lineedit.text(),
+            'geocode': self.search_lineedit.text(),
             'apikey': '40d1649f-0493-4b70-98ba-98533de7710b',
             'format': 'json'
         }
@@ -101,6 +98,7 @@ class Example(QMainWindow):
             self.scale = 8
         elif self.scale > 12:
             self.scale = 12
+
         self.pt = f'{coords},pm2lbm'
         self.get_image(coords, self.scale)
         self.coords = coords

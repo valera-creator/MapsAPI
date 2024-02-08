@@ -28,20 +28,18 @@ def check_response(response):
         quit()
 
 
-SCREEN_SIZE = [600, 520]
-
-
 class Example(QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
 
     def initUI(self):
+        self.SCREEN_SIZE = [600, 520]
         self.coords = "39.847061,57.576481"
         self.pt = ''
         self.scale = 1
         self.cur_type_map = 'map'
-        self.setGeometry(100, 100, *SCREEN_SIZE)
+        self.setGeometry(100, 100, *self.SCREEN_SIZE)
         self.setWindowTitle('Задание 9')
         self.get_image(self.coords, self.scale)
 
@@ -55,10 +53,10 @@ class Example(QMainWindow):
         self.btn_combobox.resize(150, 30)
         self.btn_combobox.clicked.connect(self.btn_combobox_click)
 
-        self.lineedit = QLineEdit(self)
-        self.lineedit.setPlaceholderText('Введите место поиска здесь')
-        self.lineedit.move(300, 465)
-        self.lineedit.resize(190, 25)
+        self.seach_lineedit = QLineEdit(self)
+        self.seach_lineedit.setPlaceholderText('Введите место поиска здесь')
+        self.seach_lineedit.move(300, 465)
+        self.seach_lineedit.resize(190, 25)
 
         self.btn_lineedit = QPushButton('Начать поиск', self)
         self.btn_lineedit.move(300, 490)
@@ -99,11 +97,11 @@ class Example(QMainWindow):
         self.is_postal_code = self.box_adresses.isChecked()
 
     def btn_lineedit_click(self):
-        if not self.lineedit.text():
+        if not self.seach_lineedit.text():
             return
 
         seach_params = {
-            'geocode': self.lineedit.text(),
+            'geocode': self.seach_lineedit.text(),
             'apikey': '40d1649f-0493-4b70-98ba-98533de7710b',
             'format': 'json'
         }
@@ -138,7 +136,7 @@ class Example(QMainWindow):
                 info = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
                     'GeocoderMetaData']['Address']['postal_code']
                 coords += f", {info}"
-            self.lineedit.setText(coords)
+            self.seach_lineedit.setText(coords)
         except Exception:  # на случай если что-то произойдет с поиском
             return
 
