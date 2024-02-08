@@ -141,6 +141,7 @@ class Example(QMainWindow):
         self.pt = f'{coords},pm2lbm'
         self.get_image(coords, self.scale)
         self.coords = coords
+        self.postal_code()
         self.image.setPixmap(QPixmap(self.map_file))
 
     def btn_addresses_clicked(self):
