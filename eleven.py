@@ -55,10 +55,10 @@ class Example(QMainWindow):
         self.btn_combobox.resize(150, 30)
         self.btn_combobox.clicked.connect(self.btn_combobox_click)
 
-        self.lineedit = QLineEdit(self)
-        self.lineedit.setPlaceholderText('Введите место поиска здесь')
-        self.lineedit.move(300, 465)
-        self.lineedit.resize(190, 25)
+        self.search_lineedit = QLineEdit(self)
+        self.search_lineedit.setPlaceholderText('Введите место поиска здесь')
+        self.search_lineedit.move(300, 465)
+        self.search_lineedit.resize(190, 25)
 
         self.btn_lineedit = QPushButton('Начать поиск', self)
         self.btn_lineedit.move(300, 490)
@@ -106,7 +106,7 @@ class Example(QMainWindow):
         try:
             coords = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
                 'GeocoderMetaData']['text']
-            self.lineedit.setText(coords)
+            self.search_lineedit.setText(coords)
         except Exception:  # на случай если что-то произойдет с поиском
             return
 
@@ -114,15 +114,15 @@ class Example(QMainWindow):
             try:
                 info = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
                     'GeocoderMetaData']['Address']['postal_code']
-                self.lineedit.setText(f'{coords}, {info}')
+                self.search_lineedit.setText(f'{coords}, {info}')
             except Exception:  # если нет почтового индекса
                 return
 
     def btn_lineedit_click(self):
-        if not self.lineedit.text():
+        if not self.search_lineedit.text():
             return
 
-        self.response = self.get_response(self.lineedit.text())
+        self.response = self.get_response(self.search_lineedit.text())
         check_response(self.response)
         data = self.response.json()
 
@@ -151,7 +151,7 @@ class Example(QMainWindow):
                 info = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
                     'GeocoderMetaData']['Address']['postal_code']
                 coords += f", {info}"
-            self.lineedit.setText(coords)
+            self.search_lineedit.setText(coords)
         except Exception:  # на случай если что-то произойдет с поиском
             return
 

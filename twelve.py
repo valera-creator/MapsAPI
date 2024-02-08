@@ -331,6 +331,7 @@ class Example(QMainWindow):
             coords_obj = list(map(float, data['features'][0]['geometry']['coordinates']))
         except Exception:  # если поиск не удался
             self.statusBar().showMessage('Ничего не найдено')
+            return
 
         s = lonlat_distance(list(map(float, coords_search.split(','))), coords_obj)
         if s > 50:
