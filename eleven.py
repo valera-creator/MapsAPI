@@ -148,6 +148,7 @@ class Example(QMainWindow):
         try:
             coords = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
                 'GeocoderMetaData']['text']
+            self.search_lineedit.setText(coords)
             if self.is_postal_code:
                 info = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
                     'GeocoderMetaData']['Address']['postal_code']
@@ -262,7 +263,7 @@ class Example(QMainWindow):
 
             self.response = self.get_response(f'{lx},{ly}')
             check_response(self.response)
-            self.postal_code()
+            self.search_lineedit.setText('')
 
     def closeEvent(self, event):
         """При закрытии формы подчищаем за собой"""
