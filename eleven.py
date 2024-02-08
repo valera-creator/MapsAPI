@@ -139,8 +139,8 @@ class Example(QMainWindow):
 
         self.pt = f'{coords},pm2lbm'
         self.get_image(coords, self.scale)
-        self.coords = coords
         self.image.setPixmap(QPixmap(self.map_file))
+        self.coords = self.postal_code()
 
     def btn_addresses_clicked(self):
         data = self.response.json()
