@@ -42,7 +42,7 @@ class Example(QMainWindow):
         self.scale = 1
         self.cur_type_map = 'map'
         self.setGeometry(100, 100, *SCREEN_SIZE)
-        self.setWindowTitle('Задание 8')
+        self.setWindowTitle('Задание 10')
         self.get_image(self.coords, self.scale)
 
         self.combobox = Combo(self)
@@ -89,8 +89,7 @@ class Example(QMainWindow):
         link = 'https://geocode-maps.yandex.ru/1.x/'
         self.response = requests.get(link, seach_params)
 
-
-        self.box_adresses = QCheckBox(self)
+        self.box_adresses = QCheckBox('почт. индекс', self)
         self.box_adresses.move(10, 460)
         self.box_adresses.clicked.connect(self.postal_code)
 
@@ -106,11 +105,12 @@ class Example(QMainWindow):
             return
         if self.is_postal_code:
             try:
-                coords += f", {data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['Address']['postal_code']}"
+                info = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
+                    'GeocoderMetaData']['Address']['postal_code']
+                coords += f", {info}"
             except Exception:  # на случай если что-то произойдет с поиском
                 return
         self.lineedit.setText(coords)
-
 
     def btn_lineedit_click(self):
         if not self.lineedit.text():
@@ -145,12 +145,13 @@ class Example(QMainWindow):
 
     def btn_addresses_clicked(self):
         data = self.response.json()
-        coords = ''
         try:
             coords = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
                 'GeocoderMetaData']['text']
             if self.is_postal_code:
-                coords += f", {data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty']['GeocoderMetaData']['Address']['postal_code']}"
+                info = data['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['metaDataProperty'][
+                    'GeocoderMetaData']['Address']['postal_code']
+                coords += f", {info}"
             self.lineedit.setText(coords)
         except Exception:  # на случай если что-то произойдет с поиском
             return
