@@ -308,12 +308,12 @@ class Example(QMainWindow):
                 f'текущий масштаб: {self.scale}')
             return
         coord_to_geo_x, coord_to_geo_y = 0.0000428, 0.0000428
-        coords = self.coords.split(',')
+        coords_obj = self.coords.split(',')
         dy = 225 - y
         dx = x - 300
 
-        lx = float(coords[0]) + dx * coord_to_geo_x * 2 ** (15 - self.scale)
-        ly = float(coords[1]) + dy * coord_to_geo_y * math.cos(math.radians(float(coords[1]))) * 2 ** (
+        lx = float(coords_obj[0]) + dx * coord_to_geo_x * 2 ** (15 - self.scale)
+        ly = float(coords_obj[1]) + dy * coord_to_geo_y * math.cos(math.radians(float(coords_obj[1]))) * 2 ** (
                 15 - self.scale)
         if lx > 180:
             lx -= 360
@@ -323,20 +323,27 @@ class Example(QMainWindow):
         if not self.organization_lineedit.text():
             self.statusBar().showMessage('Пустое поле организации')
             return
-        response = make_request_search(coords_search, self.organization_lineedit.text())
-        check_response(response)
+        self.response = make_request_search(coords_search, self.organization_lineedit.text())
+        check_response(self.response)
 
-        data = response.json()
+        data = self.response.json()
         try:
-            coords = list(map(float, data['features'][0]['geometry']['coordinates']))
+            coords_obj = list(map(float, data['features'][0]['geometry']['coordinates']))
         except Exception:  # если поиск не удался
             self.statusBar().showMessage('Ничего не найдено')
 
-        s = lonlat_distance(list(map(float, coords_search.split(','))), coords)
+        s = lonlat_distance(list(map(float, coords_search.split(','))), coords_obj)
         if s > 50:
             self.statusBar().showMessage('в расстоянии 50 метров ничего нет')
         else:
-            self.search_lineedit.setText(f"адрес: {data['features'][0]['properties']['description']}")
+            self.coords = ','.join(map(str, coords_obj))
+            self.pt = f'{self.coords},pm2lbm'
+            self.get_image(self.coords, self.scale)
+            self.image.setPixmap(QPixmap(self.map_file))
+
+            self.response = self.get_response(self.coords)
+            check_response(self.response)
+            self.postal_code()
 
     def mousePressEvent(self, event):
         self.statusBar().clearMessage()
