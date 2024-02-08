@@ -223,6 +223,7 @@ class Example(QMainWindow):
             file.write(response.content)
 
     def keyPressEvent(self, event):
+        self.statusBar().clearMessage()
         if event.key() == Qt.Key_PageUp and self.scale < 20:
             self.scale += 1
         elif event.key() == Qt.Key_PageDown and self.scale > 0:
@@ -329,11 +330,11 @@ class Example(QMainWindow):
         try:
             coords = list(map(float, data['features'][0]['geometry']['coordinates']))
         except Exception:  # если поиск не удался
-            self.search_lineedit.setText('Ничего не найдено')
+            self.statusBar().showMessage('Ничего не найдено')
 
         s = lonlat_distance(list(map(float, coords_search.split(','))), coords)
         if s > 50:
-            self.search_lineedit.setText('в расстоянии 50 метров ничего нет')
+            self.statusBar().showMessage('в расстоянии 50 метров ничего нет')
         else:
             self.search_lineedit.setText(f"адрес: {data['features'][0]['properties']['description']}")
 
